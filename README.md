@@ -1,4 +1,5 @@
 # grunt-init-fcoo-application
+>Version 1.0.3
 
 >Create a application repository with [grunt-init] including template for index.html, .js and .scss files
 
