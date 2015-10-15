@@ -1,0 +1,3 @@
+[submodule "davs"]
+	path = davs
+	url = https://github.com/NielsHolt/this-is-a-submodule.git
