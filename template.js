@@ -52,8 +52,10 @@ exports.template = function(grunt, init, done) {
 		props.licenses = ['MIT'];
 		props.year = (new Date()).getFullYear();
 
-    // Files to copy (and process).
+
+		// Files to copy (and process).
     var files = init.filesToCopy(props);
+
 
     // Add properly-named license files.
     init.addLicenseFiles(files, props.licenses);
@@ -61,7 +63,15 @@ exports.template = function(grunt, init, done) {
     // Actually copy (and process) files.
     init.copyAndProcess(files, props);
 
-    // All done!
+
+		//Copy gruntfile.js and package.json from gruntfile/ to root
+		var src_path = init.srcpath( '/../gruntfile/' );
+		init.copyAndProcess({
+				'package.json': src_path+'package.json', 
+				'gruntfile.js': src_path+'gruntfile.js' 
+		}, props );
+
+		// All done!
     done();
 	});
 
