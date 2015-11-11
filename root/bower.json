@@ -6,10 +6,6 @@
     "{%= author_name %} {%= author_email %}"
   ],
   "description": "{%= description %}",
-  "main": [
-    "dist/{%= name %}.min.js",
-    "dist/{%= name %}.min.css"
-  ],
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/FCOO/{%= name %}.git"
