@@ -36,10 +36,12 @@ Where there are the following task:
 ### `>grunt dev`
 **TODO: Er ikke færdig** 
 Building a development version in `\demo` or `\dev`
+
 - Check syntax of `.js` and `.scss` files in `\src`
 - Update all bower components
 - Concat all `.js` and `.css` files in bower components into `\demo\bower_components.js` and `\demo\bower_components.css`
 - Copy all images and font files used by bower components to `\demo\images` and `\demo\fonts`   
+- TODO: Create `index.html` somewhere...
 
 
 ### `>grunt prod`
@@ -50,7 +52,8 @@ In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity dete
 - Update all bower components   
 - Concat and minify all `.js` files in bower components **AND** in `\src` into one file `\dist\[[APPLICATIONNAME]_[TIMESTAMP].js` and `\dist\[[APPLICATIONNAME]_[TIMESTAMP].min.js`      
 - Compile all `.scss` files in `\src` and concat and minify them with all the `.css` files in bower components **AND** in `\src` into one file `\dist\[[APPLICATIONNAME]_[TIMESTAMP].css` and `\dist\[[APPLICATIONNAME]_[TIMESTAMP].min.css`
-- Create `\dist\index.html` from `\src\index_TEMPLATE.html`, `\src\meta.html`, and `\src\body.html` 
+- Create `\dist\index.html` from `\src\index_TEMPLATE.html`, `\src\meta.html`, and `\src\body.html`
+- Create `\dist\index-dev.html` as `\dist\index-dev.html` but with the non-minified versions of js- and css-files
 - Copy all images and font files used by bower components to `\dist\images` and `\dist\fonts`   
 - Copy all images and font files in `\src` to `\dist\images` and `\dist\fonts`
 
@@ -83,13 +86,15 @@ In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity dete
 
 ### `>grunt github`
 Create a complete new release and push it to [GitHub][]
+
 - Prompt for 
 	- new version (patch / minor / major)
 	- description of the release
 	- update branch `gh-pages` (yes/no)
 - Run `grunt prod` *(optional)*
 - Update `version` in `bower.json` and `package.json`
-- Update `\dist\index.html` with new version (only *Application*)
+- Update `\dist\index.html` and `\dist\index-dev.html` with new version (only *Application*)
+- Update `\dist\*.js` with new version (only *Package*)
 - Add all files in [Git][]. Includes **all** files except those specified in `.gitignore` 
 - Commit all files in [Git][]
 - Create a new `TAG` with message "*v1.2.3*"
@@ -130,7 +135,7 @@ To stop it run
 To include `gruntfile.js` and `package.json` in a new [grunt-init][] template, you must add this repository as a [Git Subtree]() to the template-repository and include some code in the `template.js` used when [grunt-init][] creating a new repository based on the template
 
 ### Git Subtree
-	>git subtree add --prefix gruntfile https://github.com/FCOO/gruntfile.js.git master --squash
+	git subtree add --prefix gruntfile https://github.com/FCOO/gruntfile.js.git master --squash
 
 
 ### template.js
