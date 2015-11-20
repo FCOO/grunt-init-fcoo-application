@@ -34,14 +34,28 @@ Where there are the following task:
 
 
 ### `>grunt dev`
-**TODO: Er ikke færdig** 
 Building a development version in `\demo` or `\dev`
+In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity determine if it is a *`Application`* or *`Package`*
 
+**You only need to run `grunt dev` when you install/uninstall a bower-component or (for application only) changes `src\body.html` or `src\head.html`**
+
+To test your package/application, just browse
+`\demo\index.html` for *Package*
+`\dev\index.html` for *Application*
+
+#### Application
 - Check syntax of `.js` and `.scss` files in `\src`
 - Update all bower components
 - Concat all `.js` and `.css` files in bower components into `\demo\bower_components.js` and `\demo\bower_components.css`
 - Copy all images and font files used by bower components to `\demo\images` and `\demo\fonts`   
-- TODO: Create `index.html` somewhere...
+- Create `\dev\index.html` from `\src\index_TEMPLATE-DEV.html`, `\src\meta.html`, and `\src\body.html`
+- Insert<br>`<script src="..src/PATH_AND_FILENAME.js"></script>` and<br>`<link href="..src/PATH_AND_FILENAME.css" rel="stylesheet">`<br>into `dev\index.html`for all js- and css/scss-files in `\src`
+
+#### Package
+- Check syntax of `.js` and `.scss` files in `\src`
+- Update all bower components
+- Concat all `.js` and `.css` files in bower components into `\demo\bower_components.js` and `\demo\bower_components.css`
+- Copy all images and font files used by bower components to `\demo\images` and `\demo\fonts`
 
 
 ### `>grunt prod`
@@ -71,7 +85,7 @@ In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity dete
  
 #### Package
 - Check syntax of `.js` and `.scss` files in `\src`
-- Concat and minify all `.js`files in `\src` into one file `\dist\[PACKAGENAME].js` and `\dist\[PACKAGENAME].min.js`
+- Concat and minify all `.js` files in `\src` into one file `\dist\[PACKAGENAME].js` and `\dist\[PACKAGENAME].min.js`
 - Compile, concat and minify all `.scss` files in `\src` into one file `\dist\PACKAGENAME.css` and `\dist\PACKAGENAME.min.css`
 - Copy all images and font files in `\src` to `\dist\images` and `\dist\fonts`
 
