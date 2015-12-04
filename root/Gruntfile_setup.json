@@ -6,5 +6,5 @@
   "beforeProdCmd"     : "",			//Cmd to be run at the start of prod-task. Multi cmd can be seperated by "&"
   "beforeDevCmd"      : "",			//Cmd to be run at the start of dev-task
   "afterProdCmd"      : "",			//Cmd to be run at the end of prod-task
-  "afterDevCmd"       : "",			//Cmd to be run at the end of dev-task
+  "afterDevCmd"       : ""			//Cmd to be run at the end of dev-task
 }
