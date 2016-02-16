@@ -330,8 +330,11 @@ module.exports = function(grunt) {
 		bower_concat: {
 			options: { separator : ';' },
 			all: {
-				dest		: 'temp_dist/bower_components.js',
-				cssDest	: 'temp_dist/bower_components.css',
+				dest: {
+					'js'	: 'temp_dist/bower_components.js',
+					'css'	: 'temp_dist/bower_components.css'
+				},
+				
 				dependencies: bower_concat_options.dependencies	|| {},
 				exclude			: bower_concat_options.exclude			|| {},
 				mainFiles		: bower_concat_options.mainFiles		|| {}
@@ -468,7 +471,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
 	grunt.loadNpmTasks('grunt-sass');
-	grunt.loadNpmTasks('grunt-contrib-cssmin'); 
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('main-bower-files');
 	grunt.loadNpmTasks('grunt-bower-concat');
 
