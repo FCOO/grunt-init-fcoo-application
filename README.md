@@ -13,7 +13,7 @@ Used in the development environment described in [fcoo-web-dev][] and normally i
 This document contains of two sections:
 
 1. [Commands and tasks](#commands): List of and specifications for the different commands available
-2. [Setup-files needed](#setup-files): Description of the  
+2. [Setup-file needed](#setup-files): Description of the setup-file(s)   
 2. [Including in a new grunt-init-template](#include): Documentation on how to include `Gruntfile.js` and `package.json` in a **new** FCOO [grunt-init][] template
 
 ---
@@ -38,7 +38,7 @@ Where there are the following task:
 Building a development version in `\demo` or `\dev`
 In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity determine if it is a *`Application`* or *`Package`*
 
-**You only need to run `grunt dev` when you install/uninstall a bower-component or (for application only) changes `src\body.html` or `src\head.html`**
+**You only need to run `grunt dev` when you install/uninstall a bower-component or (for application only) changes `src\_body.html` or `src\_head.html`**
 
 To test your package/application, just browse
 `\demo\index.html` for *Package*
@@ -49,7 +49,7 @@ To test your package/application, just browse
 - Update all bower components
 - Concat all `.js` and `.css` files in bower components into `\demo\bower_components.js` and `\demo\bower_components.css`
 - Copy all images and font files used by bower components to `\demo\images` and `\demo\fonts`   
-- Create `\dev\index.html` from `\src\index_TEMPLATE-DEV.html`, `\src\meta.html`, and `\src\body.html`
+- Create `\dev\index.html` from `\src\index_TEMPLATE-DEV.html`, `\src\_head.html`, and `\src\_body.html`
 - Insert<br>`<script src="..src/PATH_AND_FILENAME.js"></script>` and<br>`<link href="..src/PATH_AND_FILENAME.css" rel="stylesheet">`<br>into `dev\index.html`for all js- and css/scss-files in `\src`
 
 #### Package
@@ -67,7 +67,7 @@ In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity dete
 - Update all bower components   
 - Concat and minify all `.js` files in bower components **AND** in `\src` into one file `\dist\[[APPLICATIONNAME]_[TIMESTAMP].js` and `\dist\[[APPLICATIONNAME]_[TIMESTAMP].min.js`      
 - Compile all `.scss` files in `\src` and concat and minify them with all the `.css` files in bower components **AND** in `\src` into one file `\dist\[[APPLICATIONNAME]_[TIMESTAMP].css` and `\dist\[[APPLICATIONNAME]_[TIMESTAMP].min.css`
-- Create `\dist\index.html` from `\src\index_TEMPLATE.html`, `\src\meta.html`, and `\src\body.html`
+- Create `\dist\index.html` from `\src\index_TEMPLATE.html`, `\src\_head.html`, and `\src\_body.html`
 - Create `\dist\index-dev.html` as `\dist\index-dev.html` but with the non-minified versions of js- and css-files
 - Copy all images and font files used by bower components to `\dist\images` and `\dist\fonts`   
 - Copy all images and font files in `\src` to `\dist\images` and `\dist\fonts`
@@ -151,12 +151,6 @@ To stop it run
 Used by `Gruntfile.js` to define the type of application, extra commands etc.
 
 See [fcoo-web-dev](https://github.com/FCOO/fcoo-web-dev#gruntfile_setup_json) for documentation of `Gruntfile_setup.json`
-
-### bower_main.json
-Use by `Gruntfile.js` to retrieve and build the included bower components.
-
-See [fcoo-web-dev](https://github.com/FCOO/fcoo-web-dev#bower_main_json) for documentation of `bower_main.json`
-
 
 
 ---
