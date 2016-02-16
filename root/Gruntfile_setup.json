@@ -11,5 +11,5 @@
   "afterDevCmd"									: "",			//Cmd to be run at the end of dev-task
 
 	"cleanUp"											: true,		//In debug: set to false
-	"bowerCheckExistence"					: true,		//true=all bower components must be pressent. false=allows missing files (only in debug)
+	"bowerCheckExistence"					: true		//true=all bower components must be pressent. false=allows missing files (only in debug)
 }
