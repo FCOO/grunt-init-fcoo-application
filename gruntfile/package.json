@@ -1,5 +1,5 @@
 {
-  "name"		: "{%= name %}",
+  "name"		: "gruntfile.js",
   "version"	: "0.0.0",
   "description": "package.json is only use for building the package. see bower.json for more info",
   "author": "Niels Holt nho@fcoo.dk",

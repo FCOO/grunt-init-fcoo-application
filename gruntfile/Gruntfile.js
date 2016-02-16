@@ -6,10 +6,12 @@ module.exports = function(grunt) {
 	var stripJsonComments	= require('strip-json-comments');
 	var semver						= require('semver');
 
-	function readFile(filename, isJSON, defaultContents){
+	function readFile(filename, isJSON, stripComments, defaultContents){
 		if (grunt.file.exists(filename)){
 			var contents = grunt.file.read(filename) ;
-			return isJSON ? JSON.parse( stripJsonComments(contents) ) : contents;
+			if (isJSON || stripComments)
+			  contents = stripJsonComments(contents);
+			return isJSON ? JSON.parse( contents ) : contents;
 		}
 		else
 			return defaultContents;
@@ -17,32 +19,94 @@ module.exports = function(grunt) {
 
 	//*******************************************************
 	// Variables to define the type of repository
-	var gruntfile_setup =	readFile('Gruntfile_setup.json', true, {	
-													isApplication			: false,	//true for stand-alone applications. false for packages/plugins
-													haveStyleSheet		: false,	//true if the packages have css and/or scss-files
-													haveJavaScript		: true,		//true if the packages have js-files
-													exitOnJSHintError	: true,		//if false any error in JSHint will not exit the task		
-													beforeProdCmd			: "",			//Cmd to be run at the start of prod-task
-													beforeDevCmd			: "",			//Cmd to be run at the start of dev-task
-													afterProdCmd			: "",			//Cmd to be run at the end of prod-task
-													afterDevCmd				: "",			//Cmd to be run at the end of dev-task
+	var gruntfile_setup =	readFile('Gruntfile_setup.json', true, true, {	
+													isApplication							: false,	//true for stand-alone applications. false for packages/plugins
+													haveStyleSheet						: false,	//true if the packages have css and/or scss-files
+													haveJavaScript						: true,		//true if the packages have js-files
+													exitOnJSHintError					: true,		//if false any error in JSHint will not exit the task		
+													minimizeBowerComponentsJS	: true,		//Only for application: Minifies the bower components js-file		
+													minimizeBowerComponentsCSS: true,		//Only for application: Minifies the bower components css-file		
+													beforeProdCmd							: "",			//Cmd to be run at the start of prod-task
+													beforeDevCmd							: "",			//Cmd to be run at the start of dev-task
+													afterProdCmd							: "",			//Cmd to be run at the end of prod-task
+													afterDevCmd								: "",			//Cmd to be run at the end of dev-task
+
+													cleanUp										: true,		//In debug: set to false
+													bowerCheckExistence				: true,		//true=all bower components must be pressent. false=allows missing files (only in debug)
+
+
+
 												}),
-			isApplication		= !!gruntfile_setup.isApplication,
-			haveStyleSheet	= !!gruntfile_setup.haveStyleSheet,
-			haveJavaScript	= !!gruntfile_setup.haveJavaScript,
+			isApplication								= !!gruntfile_setup.isApplication,
+			haveStyleSheet							= !!gruntfile_setup.haveStyleSheet,
+			haveJavaScript							= !!gruntfile_setup.haveJavaScript,
+			minimizeBowerComponentsJS		= !!gruntfile_setup.minimizeBowerComponentsJS,
+			minimizeBowerComponentsCSS	= !!gruntfile_setup.minimizeBowerComponentsCSS,
+			cleanUp											= !!gruntfile_setup.cleanUp,
+			bowerCheckExistence					= !!gruntfile_setup.bowerCheckExistence,
+
 
 			//new variable for easy syntax	
-			isPackage				= !isApplication;
+			isPackage				= !isApplication,
 	
+
+
+
+	//options for minifing css-files.
+			cssminOptions = {
+				keepBreaks					: false,	// whether to keep line breaks (default is false)
+				keepSpecialComments	: 0,			// * for keeping all (default), 1 for keeping first one only, 0 for removing all
+				compatibility				: 'ie8'		//'ie7' - Internet Explorer 7 compatibility mode, 'ie8' - Internet Explorer 8 compatibility mode, '' or '*' (default) - Internet Explorer 9+ compatibility mode
+
+				//advanced							: ??, //set to false to disable advanced optimizations - selector & property merging, reduction, etc.
+				//aggressiveMerging			: ??, //set to false to disable aggressive merging of properties.
+				//benchmark							: ??, //turns on benchmarking mode measuring time spent on cleaning up (run npm run bench to see example)
+				//debug									: ??, //set to true to get minification statistics under stats property (see test/custom-test.js for examples)
+				//inliner								: ??, //a hash of options for @import inliner, see test/protocol-imports-test.js for examples, or this comment for a proxy use case.
+				//mediaMerging					: ??, //whether to merge @media at-rules (default is true)
+				//processImport					: ??, //whether to process @import rules
+				//processImportFrom			: ??, //a list of @import rules, can be ['all'] (default), ['local'], ['remote'], or a blacklisted path e.g. ['!fonts.googleapis.com']
+				//rebase								: ??, //set to false to skip URL rebasing
+				//relativeTo						: ??, //path to resolve relative @import rules and URLs
+				//restructuring					: ??, //set to false to disable restructuring in advanced optimizations
+				//root									: ??, //path to resolve absolute @import rules and rebase relative URLs
+				//roundingPrecision			: ??, //rounding precision; defaults to 2; -1 disables rounding
+				//semanticMerging				: ??, //set to true to enable semantic merging mode which assumes BEM-like content (default is false as it's highly likely this will break your stylesheets - use with caution!)
+				//shorthandCompacting		: ??, //set to false to skip shorthand compacting (default is true unless sourceMap is set when it's false)
+				//sourceMap							: ??, //exposes source map under sourceMap property, e.g. new CleanCSS().minify(source).sourceMap (default is false) If input styles are a product of CSS preprocessor (Less, Sass) an input source map can be passed as a string.
+				//sourceMapInlineSources: ??, //set to true to inline sources inside a source map's sourcesContent field (defaults to false) It is also required to process inlined sources from input source maps.
+				//target								: ??, //path to a folder or an output file to which rebase all URLs
+		
+			},
+
+
+
 	//*******************************************************
-	var today						= grunt.template.today("yyyy-mm-dd-HH-MM-ss"),
-			todayStr				= grunt.template.today("dd-mmm-yyyy HH:MM"),
-			bwr							= grunt.file.readJSON('bower.json'),
-			currentVersion	= bwr.version,
-			name						= bwr.name,
-			adjustedName		= name.toLowerCase().replace(' ','_'),
-			name_today			= adjustedName +'_' + today,
-			githubTasks			= [];
+			today									= grunt.template.today("yyyy-mm-dd-HH-MM-ss"),
+			todayStr							= grunt.template.today("dd-mmm-yyyy HH:MM"),
+			bwr										= grunt.file.readJSON('bower.json'),
+			currentVersion				= bwr.version,
+			name									= bwr.name,
+			adjustedName					= name.toLowerCase().replace(' ','_'),
+			name_today						= adjustedName +'_' + today,
+			githubTasks						= [],
+			bower_concat_options	= {
+				dependencies: {},
+				exclude			: {},
+				mainFiles		: {}
+			};
+
+
+	//Converts bwr.overrides to options for bower-concat
+	var overrides = bwr.overrides || {};
+	for (var packageName in overrides)
+		if ( overrides.hasOwnProperty(packageName) ){
+			var p_overrides = overrides[packageName];
+			if (p_overrides.dependencies)
+			  bower_concat_options.dependencies[packageName] = p_overrides.dependencies;
+			if (p_overrides.main)
+			  bower_concat_options.mainFiles[packageName] = p_overrides.main;
+		}
 
 
 	//Capture the log.header function to remove the 'Running tast SOMETHING" message
@@ -114,8 +178,7 @@ module.exports = function(grunt) {
 			src_sass_to_src_css_files		= merge( src_to_src_files,		sass_to_css_files ), //src/*.scss => src/*.css
 			temp_sass_to_temp_css_files	= merge( temp_to_src_files,	sass_to_css_files	), //temp/*.scss => temp/*.css
 
-			bower_concat_options	= readFile('bower_main.json', true, {}),
-			jshint_options				= readFile('.jshintrc', true, {}),			
+			jshint_options				= readFile('.jshintrc'			, true, true,	{}),			
 
 			title = 'fcoo.dk - ' + name,
 
@@ -128,8 +191,8 @@ module.exports = function(grunt) {
 			
 	if (isApplication){
 		//Read the contents for the <HEAD>..</HEAD> and <BODY</BODY>
-		head_contents = readFile('src/head.html', false, '');
-		body_contents = readFile('src/body.html', false, 'BODY IS MISSING');
+		head_contents = readFile('src/_head.html', false, true, '');
+		body_contents = readFile('src/_body.html', false, true, 'BODY IS MISSING');
 	}			
 
 	//***********************************************
@@ -151,10 +214,10 @@ module.exports = function(grunt) {
 			temp_to_temp_dist_srcminjs:		{ files: { 'temp_dist/src.min.js'	: ['temp/**/*.min.js']	} },
 			temp_to_temp_dist_srcmincss:	{ files: { 'temp_dist/src.min.css': ['temp/**/*.min.css']	} },
 
-			temp_dist_js_to_appnamejs					: {	dest: 'dist/'+name_today+'.js',				src: ['temp_dist/bower_components.js',	'temp_dist/src.js'			] }, //Combine the src.js and bower_components.js => APPLICATIONNAME_TODAY.js
-			temp_dist_css_to_appnamecss				: {	dest: 'dist/'+name_today+'.css',			src: ['temp_dist/bower_components.css',	'temp_dist/src.css'			] }, //Combine the src.css and bower_components.css => APPLICATIONNAME_TODAY.css
-			temp_dist_minjs_to_appnameminjs		: {	dest: 'dist/'+name_today+'.min.js',		src: ['temp_dist/bower_components.js',	'temp_dist/src.min.js'	] }, //Combine the src.min.js and bower_components.js => APPLICATIONNAME_TODAY.min.js
-			temp_dist_mincss_to_appnamemincss	: {	dest: 'dist/'+name_today+'.min.css',	src: ['temp_dist/bower_components.css',	'temp_dist/src.min.css'	] }, //Combine the src.min.css and bower_components.css => APPLICATIONNAME_TODAY.min.css
+			temp_dist_js_to_appnamejs					: {	dest: 'dist/'+name_today+'.js',				src: ['temp_dist/bower_components.js',			'temp_dist/src.js'			] }, //Combine the src.js and bower_components.js => APPLICATIONNAME_TODAY.js
+			temp_dist_css_to_appnamecss				: {	dest: 'dist/'+name_today+'.css',			src: ['temp_dist/bower_components.css',			'temp_dist/src.css'			] }, //Combine the src.css and bower_components.css => APPLICATIONNAME_TODAY.css
+			temp_dist_minjs_to_appnameminjs		: {	dest: 'dist/'+name_today+'.min.js',		src: ['temp_dist/bower_components.min.js',	'temp_dist/src.min.js'	] }, //Combine the src.min.js and bower_components.js => APPLICATIONNAME_TODAY.min.js
+			temp_dist_mincss_to_appnamemincss	: {	dest: 'dist/'+name_today+'.min.css',	src: ['temp_dist/bower_components.min.css',	'temp_dist/src.min.css'	] }, //Combine the src.min.css and bower_components.css => APPLICATIONNAME_TODAY.min.css
 		},
 
 		//** copy **
@@ -173,12 +236,21 @@ module.exports = function(grunt) {
 			//Copy all *.js and *.css from temp_dist to dist
 			temp_dist_jscss_to_dist	: { expand: false,	filter: 'isFile',	cwd: 'temp_dist/',	src: ['*.js', '*.css'],	dest: 'dist'	},
 
-			//Copy src/index_TEMPLATE.html to dist/index.html
-			src_indexhtml_to_dist			: { expand: false,	filter: 'isFile',	cwd: '',	src: ['src/index_TEMPLATE.html'],	dest: 'dist/index.html'	},
-			src_indexhtml_to_dist_dev	: { expand: false,	filter: 'isFile',	cwd: '',	src: ['src/index_TEMPLATE.html'],	dest: 'dist/index-dev.html'	},
+			//Copy src/_index_TEMPLATE.html to dist/index.html
+			src_indexhtml_to_dist			: { expand: false,	filter: 'isFile',	cwd: '',	src: ['src/_index_TEMPLATE.html'],	dest: 'dist/index.html'	},
+			src_indexhtml_to_dist_dev	: { expand: false,	filter: 'isFile',	cwd: '',	src: ['src/_index_TEMPLATE.html'],	dest: 'dist/index-dev.html'	},
 
-			//Copy src/index_TEMPLATE-DEV.html to dev/index.html
-			src_indexhtml_to_dev			: { expand: false,	filter: 'isFile',	cwd: '',	src: ['src/index_TEMPLATE-DEV.html'],	dest: 'dev/index.html'	},
+			//Copy src/_index_TEMPLATE-DEV.html to dev/index.html
+			src_indexhtml_to_dev			: { expand: false,	filter: 'isFile',	cwd: '',	src: ['src/_index_TEMPLATE-DEV.html'],	dest: 'dev/index.html'	},
+
+			//Copies alle files in src\_dist_files to dev or dist, excl. '_*.*'
+			src__dist_files_to_dev		: { expand: true,	cwd: 'src/_dist_files/',		src: srcExclude_(['**/*.*']),	dest: 'dev'		},
+			src__dist_files_to_dist		: { expand: true,	cwd: 'src/_dist_files/',		src: srcExclude_(['**/*.*']),	dest: 'dist'	},
+			
+			//Copy temp_dist\bower_components.js/css to Copy temp_dist\bower_components.min.js/css (used if bower-components isn't minified)
+			temp_dist_bower_js_to_bower_min_js	:	{ expand: false,	filter: 'isFile',	cwd: '',	src: ['temp_dist/bower_components.js'],		dest: 'temp_dist/bower_components.min.js'		},
+			temp_dist_bower_css_to_bower_min_css:	{ expand: false,	filter: 'isFile',	cwd: '',	src: ['temp_dist/bower_components.css'],	dest: 'temp_dist/bower_components.min.css'	},
+
 		},
 		
 		//** rename **	
@@ -243,8 +315,8 @@ module.exports = function(grunt) {
 				base: 'bower_components', 
 				dest: 'temp',
 				options: {
-					checkExistence: false, 
-					debugging			: false, 
+					checkExistence: bowerCheckExistence, 
+					debugging			: true, 
 					paths: {
 						bowerDirectory	: 'bower_components',
 						bowerrc					: '.bowerrc',
@@ -260,10 +332,9 @@ module.exports = function(grunt) {
 			all: {
 				dest		: 'temp_dist/bower_components.js',
 				cssDest	: 'temp_dist/bower_components.css',
-
 				dependencies: bower_concat_options.dependencies	|| {},
 				exclude			: bower_concat_options.exclude			|| {},
-				mainFiles		: bower_concat_options.mainFiles		|| {},
+				mainFiles		: bower_concat_options.mainFiles		|| {}
 			}
 		},
 		
@@ -273,14 +344,21 @@ module.exports = function(grunt) {
 									{	force: !gruntfile_setup.exitOnJSHintError },
 									jshint_options																	//All options are placed in .jshintrc allowing jshint to be run as stand-alone command
 								),
-		  all			: srcExclude_('src/**/*.js'), //['src/**/*.js'],
+		  all			: srcExclude_('src/**/*.js'), 
 		},
 
 		// ** uglify **		
-		uglify: {	'temp_js'		:	{	files: [{ expand: true,		filter: 'isFile',	src: srcExclude_(['temp/**/*.js', '!**/*.min.js']),		dest: '',	ext: '.min.js',		extDot: 'first' }] } },
+		uglify: {	
+			'temp_js'							:	{	files: [{ expand: true,		filter: 'isFile',	src: srcExclude_(['temp/**/*.js', '!**/*.min.js']),	dest: '',	ext: '.min.js',		extDot: 'first' }] },
+			'temp_dist_bower_js'	:	{	files: [{ expand: false,	filter: 'isFile',	src: ['temp_dist/bower_components.js'],							dest: 'temp_dist/bower_components.min.js'		}] } 
+		},
 
 		// ** cssmin
-		cssmin: {	'temp_css'	: {	files: [{ expand: true,		filter: 'isFile',	src: srcExclude_(['temp/**/*.css', '!**/*.min.css']),	dest: '',	ext: '.min.css',	extDot: 'first'	}] } },
+		cssmin: {	
+			options								: cssminOptions,
+			'temp_css'						: {	files: [{ expand: true,		filter: 'isFile',	src: srcExclude_(['temp/**/*.css', '!**/*.min.css']),	dest: '',	ext: '.min.css',	extDot: 'first'	}] },
+			'temp_dist_bower_css'	: {	files: [{ expand: false,	filter: 'isFile',	src: ['temp_dist/bower_components.css'],							dest: 'temp_dist/bower_components.min.css'	}] } 
+		},
 
 		
 		// ** exec **
@@ -390,7 +468,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
 	grunt.loadNpmTasks('grunt-sass');
-	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.loadNpmTasks('grunt-contrib-cssmin'); 
 	grunt.loadNpmTasks('main-bower-files');
 	grunt.loadNpmTasks('grunt-bower-concat');
 
@@ -626,11 +704,21 @@ module.exports = function(grunt) {
 	var tasks				= [],
 			isProdTasks = true,
 			isDevTasks;
+
 			
+	grunt.registerTask('_set_process_env_DEV',	function(){ process.env.NODE_ENV = 'dev'; });
+	grunt.registerTask('_set_process_env_PROD', function(){ process.env.NODE_ENV = 'prod'; });
+
+
 	for (var i=0; i<2; i++ ){
 		tasks = [];
 		isDevTasks = !isProdTasks;
 		
+
+		tasks.push( isProdTasks ? '_set_process_env_PROD' : '_set_process_env_DEV');
+
+
+
 		//Run "before-commands" (if any)
 		tasks.push( isProdTasks ? '_before_prod' : '_before_dev');
 
@@ -665,9 +753,12 @@ module.exports = function(grunt) {
 
 			tasks.push(
 				'copy:temp_images_to_temp_dist',	//Copy all image-files from temp to temp_dist/images
-				'copy:temp_fonts_to_temp_dist',		//Copy all font-files from temp to temp_dist/fonts
-				'clean:temp'											//clean /temp
+				'copy:temp_fonts_to_temp_dist'		//Copy all font-files from temp to temp_dist/fonts
 			);
+
+			if (cleanUp)
+				tasks.push(	'clean:temp' );											//clean /temp
+
 
 		} //end of if (isProdTasks){...
 
@@ -684,14 +775,20 @@ module.exports = function(grunt) {
 		
 			tasks.push( 
 				'copy:temp_images_to_temp_dist',	//Copy all image-files from temp to temp_dist/images
-				'copy:temp_fonts_to_temp_dist',		//Copy all font-files from temp to temp_dist/fonts
-				'clean:temp'											//clean /temp
+				'copy:temp_fonts_to_temp_dist'		//Copy all font-files from temp to temp_dist/fonts
 			);
+			if (cleanUp)
+				tasks.push(	'clean:temp' );											//clean /temp
+
 		}
 
 
 		//MODIFY (RENAME AND/OR MOVE) FILES IN DEV OR IN TEMP_DIST BEFORE THEY ARE MOVED TO DIST
 		if (isApplication && isProdTasks){
+			//Minify or copy bower_components.js and/or bower_components.css to bower_components.min.js/css 
+			tasks.push( minimizeBowerComponentsJS		? 'uglify:temp_dist_bower_js'		: 'copy:temp_dist_bower_js_to_bower_min_js'		);
+			tasks.push( minimizeBowerComponentsCSS	? 'cssmin:temp_dist_bower_css'	: 'copy:temp_dist_bower_css_to_bower_min_css' );
+
 			//Concat js/css files to APPLICATIONNAME_TODAY[.min].js/css in DIST and delete from test_dist
 			tasks.push(
 				'concat:temp_dist_js_to_appnamejs',					//Combine the src.js and bower_components.js => APPLICATIONNAME_TODAY.js
@@ -699,20 +796,20 @@ module.exports = function(grunt) {
 				'concat:temp_dist_minjs_to_appnameminjs',		//Combine the src.min.js and bower_components.js => APPLICATIONNAME_TODAY.min.js
 				'concat:temp_dist_mincss_to_appnamemincss',	//Combine the src.min.css and bower_components.css => APPLICATIONNAME_TODAY.min.css
 						
-				'copy:src_indexhtml_to_dist',								//Copy index_TEMPLATE.html from src => dist/index.html
-				'copy:src_indexhtml_to_dist_dev',						//Copy index_TEMPLATE.html from src => dist/index-dev.html
+				'copy:src_indexhtml_to_dist',								//Copy _index_TEMPLATE.html from src => dist/index.html
+				'copy:src_indexhtml_to_dist_dev',						//Copy _index_TEMPLATE.html from src => dist/index-dev.html
 				'replace:dist_indexhtml_meta',							//Insert meta-data in dist/index.html and dist/index-dev.html
 				'replace:dist_indexhtml_jscss',							//Insert links into dist/index.html
-				'replace:dist_indexdevhtml_jscss',					//Insert links into dist/index-dev.html
-				
-				'clean:temp_disk_jscss'											//Delete *.js/css from temp_dist
-			 );
+				'replace:dist_indexdevhtml_jscss'						//Insert links into dist/index-dev.html
+			);	
+			if (cleanUp)
+				tasks.push( 'clean:temp_disk_jscss' ); //Delete *.js/css from temp_dist
 		}
 
 		if (isApplication && isDevTasks){
-			//Copy src/index_TEMPLATE-DEV.html to \dev and insert meta-data AND create links for all js- and css-files in src
+			//Copy src/_index_TEMPLATE-DEV.html to \dev and insert meta-data AND create links for all js- and css-files in src
 			tasks.push(
-				'copy:src_indexhtml_to_dev',	//Copy index_TEMPLATE-DEV.html from src => dev/index.html
+				'copy:src_indexhtml_to_dev',	//Copy _index_TEMPLATE-DEV.html from src => dev/index.html
 				'_create_dev_links',			
 				'replace:dev_indexhtml_metalink' //Insert meta-data and <link...> in dev/index.html
 			);
@@ -732,13 +829,19 @@ module.exports = function(grunt) {
 		
 		if (isProdTasks){
 			tasks.push( 'copy:temp_dist_to_dist' );	//Copy all files from temp_dist to dist
+			if (isApplication)
+				tasks.push( 'copy:src__dist_files_to_dist' );		//Copies alle files in src\_dist_files to dist, excl. '_*.*'
 		}
 
 		if (isApplication && isDevTasks){
-			tasks.push( 'copy:temp_dist_to_dev' );	//Copy all files from temp_dist to dev
+			tasks.push( 
+				'copy:temp_dist_to_dev',			//Copy all files from temp_dist to dev
+				'copy:src__dist_files_to_dev'	//Copies alle files in src\_dist_files to dev, excl. '_*.*'
+			);
 		}
 
-		tasks.push( 'clean:temp_dist');
+		if (cleanUp)
+		  tasks.push( 'clean:temp_dist');
 
 		
 		//Run "after-commands" (if any)
