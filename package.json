@@ -1,9 +1,13 @@
 {
-  "name"		: "gruntfile.js",
+  "name"		: "{%= name %}",
   "version"	: "0.0.0",
-  "description": "package.json is only use for building the package. see bower.json for more info",
-  "author": "Niels Holt nho@fcoo.dk",
-  "license": "MIT",
+  "homepage": "https://github.com/FCOO/{%= name %}",
+	"author": "{%= author_name %} {%= author_email %}",
+	"description": "package.json is only use for building the package. see bower.json for more info",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/FCOO/{%= name %}.git"
+	},
   "devDependencies": {
     "grunt-bower-concat": "latest",
     "grunt-continue": "latest",
@@ -29,9 +33,5 @@
   "jshintConfig": {
     "jshintrc": true
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/FCOO/jquery-time-slider.git"
-  },
-  "homepage": "https://github.com/FCOO/jquery-time-slider"
+  "license": "MIT"
 }
