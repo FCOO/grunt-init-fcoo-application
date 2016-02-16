@@ -49,7 +49,7 @@ To test your package/application, just browse
 - Update all bower components
 - Concat all `.js` and `.css` files in bower components into `\demo\bower_components.js` and `\demo\bower_components.css`
 - Copy all images and font files used by bower components to `\demo\images` and `\demo\fonts`   
-- Create `\dev\index.html` from `\src\index_TEMPLATE-DEV.html`, `\src\_head.html`, and `\src\_body.html`
+- Create `\dev\index.html` from `\src\_index_TEMPLATE-DEV.html`, `\src\_head.html`, and `\src\_body.html`
 - Insert<br>`<script src="..src/PATH_AND_FILENAME.js"></script>` and<br>`<link href="..src/PATH_AND_FILENAME.css" rel="stylesheet">`<br>into `dev\index.html`for all js- and css/scss-files in `\src`
 
 #### Package
@@ -67,7 +67,7 @@ In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity dete
 - Update all bower components   
 - Concat and minify all `.js` files in bower components **AND** in `\src` into one file `\dist\[[APPLICATIONNAME]_[TIMESTAMP].js` and `\dist\[[APPLICATIONNAME]_[TIMESTAMP].min.js`      
 - Compile all `.scss` files in `\src` and concat and minify them with all the `.css` files in bower components **AND** in `\src` into one file `\dist\[[APPLICATIONNAME]_[TIMESTAMP].css` and `\dist\[[APPLICATIONNAME]_[TIMESTAMP].min.css`
-- Create `\dist\index.html` from `\src\index_TEMPLATE.html`, `\src\_head.html`, and `\src\_body.html`
+- Create `\dist\index.html` from `\src\_index_TEMPLATE.html`, `\src\_head.html`, and `\src\_body.html`
 - Create `\dist\index-dev.html` as `\dist\index-dev.html` but with the non-minified versions of js- and css-files
 - Copy all images and font files used by bower components to `\dist\images` and `\dist\fonts`   
 - Copy all images and font files in `\src` to `\dist\images` and `\dist\fonts`
