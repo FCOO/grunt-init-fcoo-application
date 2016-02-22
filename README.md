@@ -3,6 +3,8 @@
 [grunt]: https://gruntjs.com
 [git]: https://git-scm.com
 [github]: https://github.com
+[grunt_setup.json]: #grunt_setupjson
+
 
 # gruntfile.js
 
@@ -13,7 +15,7 @@ Used in the development environment described in [fcoo-web-dev][] and normally i
 This document contains of two sections:
 
 1. [Commands and tasks](#commands): List of and specifications for the different commands available
-2. [Setup-file needed](#setup-files): Description of the setup-file(s)   
+2. [`grunt_setup.json`](#grunt_setupjson): The setup-file for `gruntfile.js`
 2. [Including in a new grunt-init-template](#include): Documentation on how to include `Gruntfile.js` and `package.json` in a **new** FCOO [grunt-init][] template
 
 ---
@@ -29,6 +31,9 @@ Where there are the following task:
 - `grunt prod` - Building a production version in `\dist`
 - `grunt github` - Create a complete new release and push it to GitHub
 
+### *Application* or *Package*
+The contents of a repository can eighter be a **web application** or a **packages/plugin** and is defined by setting the `isApplication` options in [grunt_setup.json][] determine if it is a *`Application`* or *`Package`*
+
 ### `>grunt check`
 - Check the syntax of all `.js` files in `\src` using [JSHint](#jshint)
 - Check the syntax of all `.scss` in `\src`
@@ -36,9 +41,11 @@ Where there are the following task:
 
 ### `>grunt dev`
 Building a development version in `\demo` or `\dev`
-In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity determine if it is a *`Application`* or *`Package`*
 
-**You only need to run `grunt dev` when you install/uninstall a bower-component or (for application only) changes `src\_body.html` or `src\_head.html`**
+**You only need to run `grunt dev` when you**
+- add or delete a source file from `\src`
+- install/uninstall a bower-component
+- changes `src\_body.html` or `src\_head.html` (for application only)
 
 To test your package/application, just browse
 `\demo\index.html` for *Package*
@@ -49,6 +56,7 @@ To test your package/application, just browse
 - Update all bower components
 - Concat all `.js` and `.css` files in bower components into `\demo\bower_components.js` and `\demo\bower_components.css`
 - Copy all images and font files used by bower components to `\demo\images` and `\demo\fonts`   
+- Copy all files in `\src\_dist_files` `\dev`
 - Create `\dev\index.html` from `\src\_index_TEMPLATE-DEV.html`, `\src\_head.html`, and `\src\_body.html`
 - Insert<br>`<script src="..src/PATH_AND_FILENAME.js"></script>` and<br>`<link href="..src/PATH_AND_FILENAME.css" rel="stylesheet">`<br>into `dev\index.html`for all js- and css/scss-files in `\src`
 
@@ -57,11 +65,13 @@ To test your package/application, just browse
 - Update all bower components
 - Concat all `.js` and `.css` files in bower components into `\demo\bower_components.js` and `\demo\bower_components.css`
 - Copy all images and font files used by bower components to `\demo\images` and `\demo\fonts`
+- Copy all files in `\src\_dist_files` to `\demo`
+
 
 
 ### `>grunt prod`
 Building a production version in `\dist`
-In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity determine if it is a *`Application`* or *`Package`*
+
 #### Application
 - Check syntax of `.js` and `.scss` files in `\src`
 - Update all bower components   
@@ -71,12 +81,15 @@ In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity dete
 - Create `\dist\index-dev.html` as `\dist\index-dev.html` but with the non-minified versions of js- and css-files
 - Copy all images and font files used by bower components to `\dist\images` and `\dist\fonts`   
 - Copy all images and font files in `\src` to `\dist\images` and `\dist\fonts`
+- Copy all files in `\src\_dist_files` to `\dist`
+
 
 ##### Example (application='*fcoo-app*')
 	dist/
 	  images/
 	  fonts/
 	  index.html
+	  index-dev.html
 	  fcoo-app_2015-12-24-13_22_50.js
 	  fcoo-app_2015-12-24-13_22_50.min.js
 	  fcoo-app_2015-12-24-13_22_50.css
@@ -89,6 +102,8 @@ In `Gruntfile_setup.json` (see [fcoo-web-dev][]) the `isApplication` entity dete
 - Concat and minify all `.js` files in `\src` into one file `\dist\[PACKAGENAME].js` and `\dist\[PACKAGENAME].min.js`
 - Compile, concat and minify all `.scss` files in `\src` into one file `\dist\PACKAGENAME.css` and `\dist\PACKAGENAME.min.css`
 - Copy all images and font files in `\src` to `\dist\images` and `\dist\fonts`
+- Copy all files in `\src\_dist_files` to `\dist`
+
 
 ##### Example (packages='*fcoo-plugin*')
 	dist/
@@ -144,13 +159,31 @@ To stop it run
 
 	git config --global --unset credential.helper
 
-<a name="setup-file"></a>
-## Setup-files
+<a name="gruntfile_setup.json"></a>
 
-### Gruntfile_setup.json
+---
+## gruntfile_setup.json
 Used by `Gruntfile.js` to define the type of application, extra commands etc.
 
-See [fcoo-web-dev](https://github.com/FCOO/fcoo-web-dev#gruntfile_setup_json) for documentation of `Gruntfile_setup.json`
+	{	
+	  "isApplication"           : false, //true for stand-alone applications. false for packages/plugins
+	  "haveJavaScript"          : true,  //true if the packages have js-files
+	  "haveStyleSheet"          : false, //true if the packages have css and/or scss-files
+
+	  minimizeBowerComponentsJS	: true,  //Only for application: Minifies the bower components js-file		
+	  minimizeBowerComponentsCSS: true,  //Only for application: Minifies the bower components css-file		
+
+	  "beforeProdCmd"           : "",    //Cmd to be run at the start of prod-task. Multi cmd can be seperated by "&"
+	  "beforeDevCmd"            : "",    //Cmd to be run at the start of dev-task
+	  "afterProdCmd"            : "",    //Cmd to be run at the end of prod-task
+	  "afterDevCmd"				: "",    //Cmd to be run at the end of dev-task
+
+	  "exitOnJSHintError"       : true,  //if false any error in JSHint will not exit the task
+	  "cleanUp"                 : true,  //In debug: set to false
+	  "bowerCheckExistence"     : true,  //true=all bower components must be pressent. false=allows missing files (only in debug)
+	  bowerDebugging            : false  //Set to true in debug
+	}
+
 
 
 ---
