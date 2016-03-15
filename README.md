@@ -27,7 +27,7 @@ or see [the documentation][grunt-init] for the correct destination directory pat
 
 1.	Create the new repository in [GitHub/FCOO](https://github.com/FCOO)
 2.	Clone the new repository to your computer/Desktop 
-3.	Open a command-prompt and go to the directory with the new (empty) repository
+3.	Open a command-prompt and go to the directory with the new repository
 4.	Run the command below and follow the prompts
 
 ```
@@ -36,5 +36,5 @@ grunt-init fcoo-application
 
 If you want to see a list of installed templates, run the command `grunt-init`
 
-_Note that this template will generate files in the current directory, so be sure not to create or alter any files in the directory._
+Note that this template will generate files in the current directory, but any files and directories will be saved in a directory named `.ORIGINAL`.
  
