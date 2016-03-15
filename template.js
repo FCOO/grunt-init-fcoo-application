@@ -94,8 +94,8 @@ exports.template = function(grunt, init, done) {
 					props.licenses = ['MIT'];
 					props.year = (new Date()).getFullYear();
 
-					props.jquery_class_name = props.class_name;
-					props.jquery_class_name = props.jquery_class_name.substring(0, 1).toLowerCase() + props.jquery_class_name.substring(1); //myClass => MyClass
+					props.is_application = 'false';
+					props.have_ghpages = 'false';
 
 			    // Files to copy (and process).
 					var files = init.filesToCopy(props);
