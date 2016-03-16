@@ -3,7 +3,7 @@
   "version"	: "0.0.0",
   "homepage": "https://github.com/FCOO/{%= name %}",
   "authors": [
-    "{%= author_name %} {%= author_email %}"
+    "{%= author_name %}"
   ],
   "description": "{%= description %}",
 	"repository": {
