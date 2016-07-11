@@ -21,7 +21,6 @@ exports.after =
 	'>grunt check\n' +
 	'>grunt dev\n' +
 	'>grunt build\n' +
-	'>grunt push\n' +
 	'*******************************************\n' +
 	'';
 
@@ -67,7 +66,6 @@ exports.template = function(grunt, init, done) {
 
 	// Clone github/fcoo/gruntfile.js into /temp
 	grunt.util.spawn(
-//		{cmd: "git", args: ["clone", "https://github.com/fcoo/gruntfile.js", "./temp"],
 		{cmd: "git", args: ["clone", "https://github.com/fcoo/fcoo-gruntfile.js", "./temp"],
 	  opts: {cwd: init.destpath, stdio: "inherit"}},
 		function(error, result, code) {
@@ -104,8 +102,7 @@ exports.template = function(grunt, init, done) {
 			    // Add properly-named license files.
 					init.addLicenseFiles(files, props.licenses);
 
-					//Add gruntfile.js and gruntfile_setup.json and package.json from gruntfile/ to files
-//					var fileList = ['gruntfile.js', 'gruntfile_setup.json', 'package.json'];
+					//Add gruntfile.js and package.json from fcoo-gruntfile.js to files
 					var fileList = ['gruntfile.js', 'package.json'];
 					for (var i=0; i<fileList.length; i++ )
 						files[ fileList[i] ] = init.destpath() + '\\temp\\' + fileList[i];
