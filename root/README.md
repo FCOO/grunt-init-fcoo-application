@@ -19,7 +19,7 @@ or
 
 ## Copyright and License
 
-Copyright (c) 2015 [FCOO](https://github.com/FCOO)
+Copyright (c) {%= year %} [FCOO](https://github.com/FCOO)
 
 ## Contact information
 
