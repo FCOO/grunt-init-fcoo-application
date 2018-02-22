@@ -14,12 +14,12 @@ Once grunt-init is installed, place this template in your `~/.grunt-init/` direc
 It's recommended that you use git to clone this template into that directory, as follows:
 
 ```
-git clone https://github.com/fcoo/grunt-init-fcoo-application.git ~/.grunt-init/fcoo-application
+git clone https://github.com/fcoo/grunt-init-fcoo-application.git ~/.grunt-init/grunt-init-fcoo-application
 ```
 
 On windows use
 ```
-git clone https://github.com/fcoo/grunt-init-fcoo-application.git "%USERPROFILE%/.grunt-init/fcoo-application"
+git clone https://github.com/fcoo/grunt-init-fcoo-application.git "%USERPROFILE%/.grunt-init/grunt-init-fcoo-application"
 ```
 or see [the documentation][grunt-init] for the correct destination directory path
 
