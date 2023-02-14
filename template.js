@@ -111,7 +111,7 @@ exports.template = function(grunt, init, done) {
                     //Add package.json and all .*rc from fcoo-gruntfile.js to files
                     var fileList = ['package.json', '.browserslistrc', '.eslintrc', '.uglifyrc', '.yarnrc', '.bowerrc', '.gitignore'];
                     for (var i=0; i<fileList.length; i++ )
-                        files[ fileList[i] ] = init.destpath() + '\\temp\\' + fileList[i];
+                        files[ fileList[i] ] = init.destpath() + '/temp/' + fileList[i];
 
                     // Actually copy (and process) files.
                     init.copyAndProcess(files, props);
