@@ -31,7 +31,7 @@ or see [the documentation][grunt-init] for the correct destination directory pat
 4.	Run the command below and follow the prompts
 
 ```
-grunt-init fcoo-application
+grunt-init grunt-init-fcoo-application
 ```
 
 If you want to see a list of installed templates, run the command `grunt-init`
