@@ -14,12 +14,8 @@ module.exports = function(grunt) {
         "fcoo_grunt_plugin":{
             default: {
                 "application"   : {
-                    "id"            : 0,  //application id. Default=0
-                    "name"          : "", //application name. Default="FCOO.dk"
-
-                    "color"         : "", //background-color of favicons. Default="" => blue color of FCOO's logo. Must have format "#123456"
-                    "faviconColor"  : ""  //Color of the favicon. Default = "" => automatic set to highest contrast to "color" between 'white' and 'blue color of FCOO's logo'
-                                          //..Individual id:value can be added for specific application
+                    "id": 0,    //application id. Default=0
+                                //..Individual id:value can be added for specific application
                 },
 
                 "haveJavaScript": true,  //true if the application have js-files
