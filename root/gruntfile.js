@@ -14,8 +14,10 @@ module.exports = function(grunt) {
         "fcoo_grunt_plugin":{
             default: {
                 "application"   : {
-                    "id": 0,    //application id. Default=0
-                                //..Individual id:value can be added for specific application
+                    "id"     : 0,           //application id. Default=0
+                    "subpath": "MISSING",   //The sub-path where the application is located. Default="MISSING"
+                    
+                    Individual id:value can be added for specific application
                 },
 
                 "haveJavaScript": true,  //true if the application have js-files
